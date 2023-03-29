@@ -1,7 +1,7 @@
 import React from 'react';
 import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
 import {RootObjectDocs} from '../types/Types';
-import {useAppNavigation} from './navigations/naviTypes';
+import {useAppNavigation} from '../navigation/naviTypes';
 
 type FilmItemPropsType = {
   item: RootObjectDocs;
@@ -37,7 +37,7 @@ export const FilmItem = ({item}: FilmItemPropsType) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#e6d9d9',
+    backgroundColor: '#fff',
     marginVertical: 10,
     padding: 15,
     borderRadius: 20,

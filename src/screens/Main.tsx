@@ -1,23 +1,44 @@
 import React, {useEffect, useState} from 'react';
-import {Platform, ScrollView, StyleSheet, TextInput, View} from 'react-native';
+import {
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../store/store';
-import {getFilmsTH} from '../store/slice';
+import {
+  getFilmFullAnswerTH,
+  getFilmsTH,
+  getRandomFilmsTH,
+} from '../store/slice';
 import {FilmItem} from '../components/FilmItem';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useAppNavigation} from '../navigation/naviTypes';
+import {DrawerActions} from '@react-navigation/native';
+import {RootObjectRandom} from '../types/Types';
 
 export const Main = () => {
   const dispatch = useAppDispatch();
   const allFilms = useAppSelector(state => state.root.allFilms.docs);
+  const randomFilms = useAppSelector(state => state.root.randomFilms);
   const [filmName, setFilmName] = useState('');
+  const navigation = useAppNavigation();
 
-  useEffect(() => {
-    dispatch(getFilmsTH('Не время умирать'));
-    // getFilmRequest();
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(getRandomFilmsTH());
+  // }, [dispatch]);
 
   const onSearchHandler = () => {
-    dispatch(getFilmsTH(filmName));
+    dispatch(getFilmFullAnswerTH(filmName))
     setFilmName('');
+  };
+
+  const findDirector = (randomFilm: RootObjectRandom) => {
+    return randomFilm.persons.find(person => person.profession === 'режиссеры')
+      ?.name;
   };
 
   return (
@@ -29,15 +50,51 @@ export const Main = () => {
           ))}
         </ScrollView>
       )}
-      <View style={styles.searchBox}>
-        <TextInput
-          placeholder="Search here"
-          placeholderTextColor="#000"
-          autoCapitalize="none"
-          style={{flex: 1, padding: 0}}
-          onChangeText={setFilmName}
+      {Object.keys(randomFilms).length > 0 && (
+        <ImageBackground
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            paddingVertical: 100,
+          }}
+          source={{
+            uri:
+              randomFilms.poster && randomFilms.poster.url
+                ? randomFilms.poster.url
+                : '',
+          }}
+          resizeMode={'cover'}>
+          <View style={styles.randomInfo}>
+            <Text numberOfLines={1} style={styles.randomTitle}>
+              {randomFilms.name} ({randomFilms.alternativeName} )
+            </Text>
+            <Text style={styles.randomText}>
+              реж. {findDirector(randomFilms)}. ({randomFilms.countries[0].name}
+              ). Премьера {randomFilms.year}
+            </Text>
+          </View>
+        </ImageBackground>
+      )}
+      <View style={styles.searchBoxContainer}>
+        <MaterialCommunityIcons
+          onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+          style={{paddingLeft: 10}}
+          name="menu"
+          color={'black'}
+          size={26}
         />
-        <Ionicons onPress={onSearchHandler} name="ios-search" size={20} />
+        <View style={styles.searchBox}>
+          <TextInput
+            placeholder="Search here"
+            placeholderTextColor="#000"
+            autoCapitalize="none"
+            value={filmName}
+            style={{flex: 1, padding: 0}}
+            onChangeText={setFilmName}
+          />
+          <Ionicons onPress={onSearchHandler} name="ios-search" size={20} />
+        </View>
       </View>
     </View>
   );
@@ -46,19 +103,47 @@ export const Main = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 55,
+    // paddingTop: 55,
     backgroundColor: 'black',
+    // paddingHorizontal: 10,
   },
+  randomTitle: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18,
+    marginBottom: 8,
+  },
+  randomText: {
+    color: 'white',
+    fontSize: 13,
+    marginBottom: 4,
+    textAlign: 'right',
+  },
+  randomInfo: {
+    backgroundColor: 'rgba(0,0,0,0.61)',
+    padding: 10,
+    borderRadius: 10,
+  },
+
   itemsContainer: {
+    paddingTop: 55,
     paddingHorizontal: 10,
   },
-  searchBox: {
+  searchBoxContainer: {
     position: 'absolute',
-    marginTop: Platform.OS === 'ios' ? 30 : 10,
+    // marginTop: Platform.OS === 'ios' ? 30 : 10,
+    backgroundColor: '#fff',
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
+    borderRadius: 5,
+  },
+  searchBox: {
     flexDirection: 'row',
     backgroundColor: '#fff',
-    width: '95%',
-    alignSelf: 'center',
+    width: '90%',
+    alignSelf: 'flex-end',
     alignItems: 'center',
     borderRadius: 5,
     padding: 10,

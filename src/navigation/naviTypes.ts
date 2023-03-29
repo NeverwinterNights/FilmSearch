@@ -1,10 +1,15 @@
-import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {
+  NavigationProp,
+  NavigatorScreenParams,
+  useNavigation,
+} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {RootObjectDocs} from '../../types/Types';
+import {RootObjectDocs} from '../types/Types';
 
 export type RootStackParamList = {
   Main: undefined;
   CurrentFilm: {info: RootObjectDocs};
+  Favorites: undefined;
 };
 
 export type NavigationUseType = NavigationProp<RootStackParamList>;
@@ -15,3 +20,7 @@ export type CurrentFilmPropsType = NativeStackScreenProps<
   RootStackParamList,
   'CurrentFilm'
 >;
+
+export type RootDrawerParamList = {
+  Routes: NavigatorScreenParams<RootStackParamList>;
+};
